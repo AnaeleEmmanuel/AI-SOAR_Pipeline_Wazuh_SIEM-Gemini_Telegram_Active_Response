@@ -1,10 +1,10 @@
-# # # Autonomous AI-SOAR Pipeline: Wazuh SIEM + Gemini AI + Telegram Active Response
+ # 🛡️Autonomous AI-SOAR Pipeline: Wazuh SIEM + Gemini AI + Telegram Active Response
 
 An end-to-end **Security Orchestration, Automation, and Response (SOAR)** pipeline that integrates **Wazuh SIEM**, **Google Gemini AI (`gemini-3.5-flash-lite`)**, and **Telegram Bot API** to automate Level 1 SOC alert triage and execute **Human-in-the-Loop (HITL)** endpoint containment via Wazuh Active Response.
 
 ---
 
-## Visual System Architecture
+## 🏗️ Visual System Architecture
 
 ```text
 +-----------------------------------------------------------------------------------+
@@ -61,7 +61,7 @@ An end-to-end **Security Orchestration, Automation, and Response (SOAR)** pipeli
 
 ---
 
-## Project Overview & Business Value
+## 🎯 Project Overview & Business Value
 
 Security Operations Centers (SOCs) suffer from severe alert fatigue—analysts spend valuable time manually parsing raw JSON logs, looking up MITRE ATT&CK techniques, and logging into firewalls to block malicious IPs.
 
@@ -73,7 +73,7 @@ This project solves that bottleneck by building a lightweight, self-hosted **AI-
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
 * **SIEM & EDR:** Wazuh Manager & Dashboard v4.14 (Ubuntu 24.04 LTS)
 * **Monitored Endpoint:** Kali Linux Agent (`ID: 001`)
@@ -84,7 +84,7 @@ This project solves that bottleneck by building a lightweight, self-hosted **AI-
 
 ---
 
-## Working Wazuh Integration Configuration
+## ⚙️Working Wazuh Integration Configuration
 
 To forward high-severity alerts (`Level >= 7`) from Wazuh Manager to the local Flask AI-SOAR webhook, the following `<integration>` block was configured inside `/var/ossec/etc/ossec.conf`:
 
@@ -107,7 +107,7 @@ sudo chmod 750 /var/ossec/integrations/custom-ai-soar
 
 ---
 
-## Persistent Production Deployment (`systemd`)
+## 🚀Persistent Production Deployment (`systemd`)
 
 To ensure the webhook server and Telegram button listener run continuously in the background and survive system reboots, the application was deployed as a `systemd` service (`/etc/systemd/system/wazuh-ai-soar.service`):
 
@@ -131,7 +131,7 @@ WantedBy=multi-user.target
 
 ---
 
-## Environment & Secrets Configuration
+##🔐  Environment & Secrets Configuration
 
 All sensitive credentials are redacted for security. To replicate this setup, configure the following variables in `app.py` (or via environment variables):
 
@@ -147,7 +147,7 @@ WAZUH_API_PASSWORD = "YOUR_WAZUH_API_PASSWORD"
 
 ---
 
-## Live Attack Simulation & Verification
+## 🧪 Live Attack Simulation & Verification
 
 1. **Simulated Attack:** Launched a multi-threaded SSH brute-force attack using `hydra` against the monitored Kali Linux endpoint (`Agent 001`):
  ```bash
@@ -159,7 +159,7 @@ WAZUH_API_PASSWORD = "YOUR_WAZUH_API_PASSWORD"
 
 ---
 
-## Key Troubleshooting & Engineering Lessons Learned
+## 🔧Key Troubleshooting & Engineering Lessons Learned
 
 Building and stabilizing this pipeline in a multi-VM environment required solving several real-world integration issues:
 
