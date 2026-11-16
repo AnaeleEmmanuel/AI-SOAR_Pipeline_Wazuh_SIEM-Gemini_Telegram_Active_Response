@@ -131,7 +131,7 @@ WantedBy=multi-user.target
 
 ---
 
-##🔐  Environment & Secrets Configuration
+## 🔐Environment & Secrets Configuration
 
 All sensitive credentials are redacted for security. To replicate this setup, configure the following variables in `app.py` (or via environment variables):
 
@@ -156,6 +156,31 @@ WAZUH_API_PASSWORD = "YOUR_WAZUH_API_PASSWORD"
 2. **Detection:** Wazuh correlated the rapid authentication failures into **Rule `5763` / `5712` (Level 10 — SSHD brute force trying to get access to the system)**.
 3. **AI Triage & Notification:** Within seconds, the Telegram bot delivered the Gemini analysis identifying **MITRE ATT&CK T1110 (Brute Force)** and recommending immediate IP containment.
 4. **Active Response Execution:** Clicking **` Block IP`** in Telegram triggered the Wazuh API (`PUT /active-response`), executing `firewall-drop` on Agent `001` and updating the Telegram alert status to **` CONTAINED`**.
+
+---
+
+## 🧭MITRE ATT&CK Framework Mapping
+
+The simulated SSH brute-force intrusion maps directly to the **Credential Access** tactic in the MITRE ATT&CK Enterprise Matrix:
+
+| Attribute | Details |
+| :--- | :--- |
+| **Tactic** | **TA0006 — Credential Access** |
+| **Technique** | **T1110 — Brute Force** |
+| **Sub-Technique** | **T1110.001 — Password Guessing** (Iterative password attempts against a valid SSH account without prior knowledge of the password) |
+| **Data Sources** | Application Log (`sshd` authentication logs), Network Traffic (`TCP/22`) |
+| **Wazuh Detection Rules** | `Rule 5716` (SSHD authentication failed) $\rightarrow$ Correlated into `Rule 5763` / `Rule 5712` (Level 10: SSHD brute force trying to get access to the system) |
+
+## 🛡️Organizational Defense & Mitigation Strategies
+
+Beyond reactive SOAR containment (`firewall-drop`), organizations should implement defense-in-depth controls to prevent and mitigate **MITRE ATT&CK T1110 (Brute Force)** attacks:
+
+1. **Enforce Phishing-Resistant Multi-Factor Authentication (MFA):** Require MFA (e.g., FIDO2/WebAuthn or TOTP) across all SSH jump hosts, VPNs, and remote access portals so compromised passwords alone cannot grant access.
+2. **Disable SSH Password Authentication:** Configure `/etc/ssh/sshd_config` with `PasswordAuthentication no` and `PubkeyAuthentication yes` to mandate cryptographic SSH key pairs and eliminate password guessing entirely.
+3. **Disable Direct Root Login:** Set `PermitRootLogin no` in `sshd_config` to force attackers to guess both a valid unprivileged username and sudo credentials.
+4. **Implement Account Lockout & Rate-Limiting Policies:** Configure PAM (`pam_faillock`) to temporarily lock accounts after repeated failed login attempts, and deploy network-level rate limiting or tools like `Fail2Ban` / Wazuh Active Response to drop offending IPs automatically.
+5. **Restrict Network Exposure (Zero Trust / Bastion Hosts):** Never expose TCP port `22` directly to the public internet. Place administrative SSH services behind a VPN, Zero Trust Network Access (ZTNA) gateway, or IP-allowlisted bastion host.
+6. **Enforce Strong Password Policies:** Require long, unique passphrases and block commonly breached passwords using `pam_pwquality` to defeat dictionary and credential-stuffing lists.
 
 ---
 
